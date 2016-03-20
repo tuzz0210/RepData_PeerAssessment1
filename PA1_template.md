@@ -1,16 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
-    toc: true
-   
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 Using the following code to read the data.
-```{r , echo=TRUE}
+
+```r
 a<-read.csv(unz("activity.zip","activity.csv"),colClasses = c("numeric","Date","character"))
 ```
 **a** is used to store our data.
@@ -18,39 +12,73 @@ a<-read.csv(unz("activity.zip","activity.csv"),colClasses = c("numeric","Date","
 
 ## What is mean total number of steps taken per day?
 The following graph gives a histogram of the total number of steps taken each day:
-```{r hist1 ,echo=TRUE}
+
+```r
 totalnum<-tapply(a$steps,a$date,sum,na.rm=TRUE)
 hist(totalnum,xlab = "the total number of steps taken each day",main="Histogram of total numbers each day")
+```
+
+![](PA1_template_files/figure-html/hist1 -1.png)
+
+```r
 meantotal<-summary(totalnum)[4]
 mediantotal<-summary(totalnum)[3]
 meantotal
+```
+
+```
+## Mean 
+## 9354
+```
+
+```r
 mediantotal
+```
+
+```
+## Median 
+##  10400
 ```
 **totalmun** gives the total number of steps taken per day, which is a vector. **meantotal**  is the mean of steps taken per day, whereas **mediantotal** is the median of the total number of steps taken per day. As we  can see, the **mean** and **median** are **9354** and **10400** respectively. 
 
 
 ## What is the average daily activity pattern?
 This is  a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis).
-```{r plot ,echo=TRUE}
+
+```r
 meaninter<-tapply(a$steps,a$interval,mean,na.rm=TRUE)
 dd<-data.frame(interval=as.numeric(names(meaninter)),meaninter)
 plot(dd[order(dd$interval),],type="l")
+```
+
+![](PA1_template_files/figure-html/plot -1.png)
+
+```r
 which.max(meaninter)
+```
+
+```
+## 835 
+## 272
 ```
 From the result, we can see the maximum number of steps corresponds to **272** and **835** interval.
 
 
 
 ## Imputing missing values
-```{r  echo=TRUE}
+
+```r
 totaln<-sum(!complete.cases(a))
 totaln
+```
 
-
+```
+## [1] 2304
 ```
 
 **totaln** gives the total number of missing values in the dataset which is **2304**. 
-```{r echo=TRUE}
+
+```r
 #use the mean for that 5-minute interval to fill in the missing values
 aa<-a
 for (i in 1:nrow(aa)){
@@ -60,9 +88,15 @@ for (i in 1:nrow(aa)){
 }
 ```
 Here, we use the mean for that 5-minute interval to fill in the missing values in our dataset. The new matrix is denoted as **aa**. 
-```{r hist2,echo=TRUE}
+
+```r
 atotalnum<-tapply(aa$steps,aa$date,sum)
 hist(atotalnum)
+```
+
+![](PA1_template_files/figure-html/hist2-1.png)
+
+```r
 ameantotal<-summary(atotalnum)[4]
 amediantotal<-summary(atotalnum)[3]
 ```
@@ -71,11 +105,12 @@ The graph above gives a histogram of the total number of steps taken each day in
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r xyplot ,echo=TRUE}
+
+```r
 library(lattice)
 week<-character(nrow(aa))
 for (i in 1:nrow(aa)){
-    if (weekdays(aa$date[i])%in%c("ÐÇÆÚÈÕ", "ÐÇÆÚÁù"))
+    if (weekdays(aa$date[i])%in%c("æ˜ŸæœŸæ—¥", "æ˜ŸæœŸå…­"))
         week[i]="weekend"
     else
         week[i]="weekday"
@@ -89,8 +124,9 @@ dd1<-data.frame(interval=as.numeric(names(meaninter1)),meaninter=meaninter1,week
 dd2<-data.frame(interval=as.numeric(names(meaninter2)),meaninter=meaninter2,week=rep("weekday",length(meaninter2)))
 ddd<-rbind(dd1[order(dd1$interval),],dd2[order(dd2$interval),])
 xyplot(meaninter~interval|week,data=ddd,layout=c(1,2),panel = panel.lines)
-
 ```
 
-**week** defines the new factor variable in the dataset with two levels ¨C ¡°weekday¡± and ¡°weekend¡± indicating whether a given date is a weekday or weekend day. The figure above shows a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
+![](PA1_template_files/figure-html/xyplot -1.png)
+
+**week** defines the new factor variable in the dataset with two levels â€“ â€œweekdayâ€ and â€œweekendâ€ indicating whether a given date is a weekday or weekend day. The figure above shows a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
